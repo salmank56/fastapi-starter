@@ -1,0 +1,6 @@
+fastapi==0.115.6
+pydantic==2.10.3
+pydantic_core==2.27.1
+pydantic_settings==2.7.0
+SQLAlchemy==2.0.30
+starlette==0.42.0
