@@ -1,5 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Annotated, Any, Literal
+from typing import Any, Literal, List, Union
+
+# Python 3.8 compatibility: Annotated is in typing_extensions
+try:
+    from typing import Annotated
+except ImportError:
+    from typing_extensions import Annotated
 
 from pydantic import (
     AnyUrl,
@@ -11,10 +17,10 @@ from pydantic import (
 from pydantic_core import MultiHostUrl
 
 
-def parse_cors(v: Any) -> list[str] | str:
+def parse_cors(v: Any) -> Union[List[str], str]:
     if isinstance(v, str) and not v.startswith("["):
         return [i.strip() for i in v.split(",")]
-    elif isinstance(v, list | str):
+    elif isinstance(v, (list, str)):
         return v
     raise ValueError(v)
 
@@ -33,7 +39,7 @@ class Settings(BaseSettings):
         return f"https://{self.DOMAIN}"
 
     BACKEND_CORS_ORIGINS: Annotated[
-        list[AnyUrl] | str, BeforeValidator(parse_cors)
+        Union[List[AnyUrl], str], BeforeValidator(parse_cors)
     ] = []
 
     POSTGRESQL_USER: str

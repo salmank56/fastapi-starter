@@ -1,0 +1,62 @@
+# ============= Core FastAPI Stack =============
+fastapi
+uvicorn[standard]
+pydantic[email]
+pydantic-settings
+sqlmodel
+sqlalchemy
+psycopg2-binary
+alembic
+
+# ============= AI/LLM Stack =============
+openai>=1.0.0
+langchain>=0.3.0
+langchain-openai
+langgraph>=0.2.0
+langchain-community
+tiktoken
+
+# ============= Vector Database =============
+pinecone-client>=3.0.0
+
+# ============= Async Task Queue =============
+celery[redis]>=5.4.0
+redis>=5.0.0
+flower
+
+# ============= WebSocket =============
+python-socketio
+
+# ============= Web Scraping =============
+playwright
+requests
+beautifulsoup4
+
+# ============= Email Integration =============
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# ============= PDF Generation =============
+reportlab
+pypdf
+
+# ============= File Storage =============
+boto3
+python-magic
+
+# ============= Security & Auth =============
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# ============= Monitoring & Logging =============
+structlog
+sentry-sdk[fastapi]
+
+# ============= Development Tools =============
+pytest
+pytest-asyncio
+httpx
+faker
+

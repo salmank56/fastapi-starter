@@ -18,11 +18,17 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-
-# Import your Models here in order for them to be visible
-from src.user.models.user import User
+# Import all models so Alembic can discover them
+from src.models import (  # noqa: F401
+    Organization, OrganizationSettings,
+    User, RefreshToken, APIKey,
+    UserPreferences, SearchTemplate, ComparisonSet,
+    SearchJob, AgentLog,
+    Vendor, Product, MediaFile,
+    Negotiation, PurchaseOrder, EmailTemplate,
+    Notification, WebhookEvent,
+    AuditLog, UsageLog
+)
 
 target_metadata = Base.metadata
 
@@ -58,26 +64,53 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# def run_migrations_online() -> None:
+#     """Run migrations in 'online' mode.
+
+#     In this scenario we need to create an Engine
+#     and associate a connection with the context.
+
+#     """
+#     # configuration = config.get_section(config.config_ini_section)
+#     # configuration["sqlalchemy.url"] = get_postgresql_url()
+
+#     connectable = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+#     # connectable = engine_from_config(
+#     #     config.get_section(config.config_ini_section, {}),
+#     #     prefix="sqlalchemy.",
+#     #     poolclass=pool.NullPool,
+#     # )
+
+#     with connectable.connect() as connection:
+#         context.configure(
+#             connection=connection, target_metadata=target_metadata, compare_type=True, include_schemas=True
+#         )
+
+#         with context.begin_transaction():
+#             context.run_migrations()
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    """Run migrations in 'online' mode."""
+    
+    connectable = create_engine(str(settings.SQLALCHEMY_DATABASE_URI),connect_args={"prepare_threshold": None})
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-    # configuration = config.get_section(config.config_ini_section)
-    # configuration["sqlalchemy.url"] = get_postgresql_url()
-
-    connectable = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
-    # connectable = engine_from_config(
-    #     config.get_section(config.config_ini_section, {}),
-    #     prefix="sqlalchemy.",
-    #     poolclass=pool.NullPool,
-    # )
+    # --- ADD THIS FUNCTION ---
+    # This filter tells Alembic to ignore Supabase system schemas
+    def include_object(object, name, type_, reflected, compare_to):
+        if type_ == "table" and object.schema in [
+            "auth", "storage", "realtime", "vault", 
+            "graphql", "graphql_public", "pgbouncer", "pgsodium"
+        ]:
+            return False
+        return True
+    # -------------------------
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True, include_schemas=True
+            connection=connection, 
+            target_metadata=target_metadata, 
+            compare_type=True, 
+            include_schemas=True, 
+            include_object=include_object  
         )
 
         with context.begin_transaction():
